@@ -17,32 +17,22 @@ ENV BUILD_VERSION=${BUILD_VERSION}
 ENV BUILD_WARNINGS_AS_ERRORS=${BUILD_WARNINGS_AS_ERRORS}
 ENV MAKE_JOBS=${MAKE_JOBS}
 
-# build toolchain
-RUN yum -y install centos-release-scl && \
-    INSTALL_PKGS="devtoolset-7-gcc devtoolset-7-gcc-c++ devtoolset-7-toolchain devtoolset-7-libstdc++-devel elfutils-libelf-devel-static llvm-toolset-7.0 glibc-static autoconf automake libtool createrepo expect git which libcurl-devel zlib-devel rpm-build libyaml-devel" && \
-    yum -y install --setopt=tsflags=nodocs $INSTALL_PKGS && \
-    rpm -V $INSTALL_PKGS && \
-    yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm && \
-    yum -y install dpkg
-
-ARG CMAKE_VERSION=3.22.5
-RUN source scl_source enable devtoolset-7 llvm-toolset-7.0 && \
-    cd /tmp && \
-    curl -L https://github.com/kitware/cmake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}.tar.gz | tar xz; \
-    cd cmake-${CMAKE_VERSION} && \
-    ./bootstrap --system-curl && \
-    make -j${MAKE_JOBS} && \
-    make install && \
-    rm -rf /tmp/cmake-${CMAKE_VERSION}
-
 COPY ./root /
 
-# DTS
-ENV BASH_ENV=/usr/bin/scl_enable \
-    ENV=/usr/bin/scl_enable \
-    PROMPT_COMMAND=". /usr/bin/scl_enable"
-
 WORKDIR /
+
+# build toolchain
+RUN yum -y install centos-release-scl; \
+    yum -y install devtoolset-9-gcc devtoolset-9-gcc-c++; \
+    source scl_source enable devtoolset-9; \
+    yum install -y git wget make m4 rpm-build
+
+# With some previous cmake versions it fails when downloading `zlib` with curl in the libs building phase
+RUN curl -L -o /tmp/cmake.tar.gz https://github.com/Kitware/CMake/releases/download/v3.22.5/cmake-3.22.5-linux-$(uname -m).tar.gz; \
+    gzip -d /tmp/cmake.tar.gz; \
+    tar -xpf /tmp/cmake.tar --directory=/tmp; \
+    cp -R /tmp/cmake-3.22.5-linux-$(uname -m)/* /usr; \
+    rm -rf /tmp/cmake-3.22.5-linux-$(uname -m)/
 
 ENTRYPOINT ["build"]
 CMD ["usage"]

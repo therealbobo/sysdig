@@ -77,6 +77,10 @@ jobs:
         run: |
           mkdir -p /source
           ln -s "$GITHUB_WORKSPACE/sysdig" /source/sysdig
+      - name: Prepare build skeleton
+        run: build cmake-skeleton
+      - name: Build skeleton
+        run: build make-skeleton
       - name: Build
         run: build cmake
       - name: Build packages
@@ -125,6 +129,8 @@ jobs:
           options: --platform=linux/arm64 -v ${{ github.workspace }}/sysdig:/source/sysdig -v ${{ github.workspace }}/sysdig-build-aarch64:/build/dev-packages
           run: |
             mkdir -p /build/dev-packages && \
+            build cmake-skeleton && \
+            build make-skeleton && \
             build cmake && \
             build package && \
             cp /build/release/sysdig-* /build/dev-packages
