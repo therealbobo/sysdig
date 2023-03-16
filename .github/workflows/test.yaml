@@ -1,0 +1,37 @@
+name: test push container image
+on: workflow_dispatch
+jobs:
+  push-container-image:
+    runs-on: ubuntu-latest
+    env:
+      BUILD_VERSION: 0.31.2
+      REGISTRY: ghcr.io
+      SYSDIG_IMAGE_BASE: ghcr.io/draios/sysdig
+    steps:
+      - name: Checkout Sysdig
+        uses: actions/checkout@v3
+      - name: Download artifacts aarch64
+        uses: actions/download-artifact@v3
+        with:
+          name: sysdig-release-${{ env.BUILD_VERSION }}-aarch64
+      - name: Download artifacts x86_64
+        uses: actions/download-artifact@v3
+        with:
+          name: sysdig-release-${{ env.BUILD_VERSION }}-x86_64
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+        with:
+          platforms: 'amd64,arm64'
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Build and push container images
+        uses: docker/build-push-action@v3
+        with:
+          platforms: linux/amd64,linux/arm64
+          file: docker/sysdig/Dockerfile
+          context: .
+          tags: ${{ env.SYSDIG_IMAGE_BASE }}:${{ env.BUILD_VERSION }}-draft
+          push: false
+          build-args:
+            BUILD_VERSION=${{ env.BUILD_VERSION }}
+
