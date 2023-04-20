@@ -9,10 +9,15 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
- steps:
-  - task: Docker@2
-    displayName: Build an image
-    inputs:
-     repository: test
-     command: build
-     Dockerfile: docker/builder/Dockerfile
+steps:
+- script: |
+    echo test
+  displayName: 'make'
+- task: DockerInstaller@0
+  inputs:
+    dockerVersion: '17.09.0-ce'
+- task: Docker@2
+  inputs:
+    command: 'build'
+    Dockerfile: 'docker/builder/Dockerfile'
+    buildContext: '.'
