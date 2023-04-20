@@ -9,9 +9,10 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
-steps:
-- script: |
-    mkdir build
-    cmake ..
-    make
-  displayName: 'make'
+- task: ContainerBuild@0
+  inputs:
+    #dockerRegistryServiceConnection: # string. Docker registry service connection. 
+    #repository: # string. Container repository. 
+    Dockerfile: 'docker/builder/Dockerfile' # string. Required. Dockerfile. Default: Dockerfile.
+    #buildContext: '.' # string. Build context. Default: ..
+    #tags: '$(Build.BuildId)' # string. Tags. Default: $(Build.BuildId).
