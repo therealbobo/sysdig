@@ -261,9 +261,7 @@ as opposed to:
 16 Error management 
 -------
 
-Error management inside libscap is done through return values, since the scap 
-library is written in C.
-Error management in the rest of the sysdig user level code base is done through
+Error management in sysdig user level code base is done through
 exceptions. We know there's a lot of debate between return values and 
 exceptions. We decided to pick the latter, so please stick with that.
 
