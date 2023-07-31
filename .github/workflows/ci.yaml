@@ -249,9 +249,18 @@ jobs:
           mkdir -p build
           cd build && cmake -Wno-dev -DBUILD_DRIVER=OFF ..
           cmake --build . --target package --config Release
+          cmake --build . --target sysdig  --config Release
+          cmake --build . --target csysdig --config Release
+          zip -r sysdig-${{ matrix.artifact_name }}.zip ./userspace/sysdig/sysdig ./userspace/sysdig/csysdig ./userspace/sysdig/sysdig ./userspace/sysdig/chisels
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: sysdig-dev-${{ matrix.artifact_name }}-x86_64.${{ matrix.artifact_ext }}
           path: |
             build/sysdig-*.${{ matrix.artifact_ext }}
+      - name: Upload artifacts zips
+        uses: actions/upload-artifact@v3
+        with:
+          name: sysdig-dev-${{ matrix.artifact_name }}-x86_64.zip
+          path: |
+            build/sysdig-${{ matrix.artifact_name }}.zip
