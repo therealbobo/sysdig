@@ -30,9 +30,9 @@ limitations under the License.
 #include <unordered_set>
 #include <atomic>
 
-#include <sinsp.h>
-#include "scap_open_exception.h"
-#include "chisel_capture_interrupt_exception.h"
+#include <libsinsp/sinsp.h>
+#include <libsinsp/scap_open_exception.h>
+#include <chisel/chisel_capture_interrupt_exception.h>
 #ifdef HAS_CAPTURE
 #ifndef WIN32
 #include "driver_config.h"
@@ -40,13 +40,13 @@ limitations under the License.
 #endif // HAS_CAPTURE
 #include "sysdig.h"
 #ifdef HAS_CHISELS
-#include "chisel.h"
-#include "chisel_utils.h"
-#include "chisel_fields_info.h"
+#include <chisel/chisel.h>
+#include <chisel/chisel_utils.h>
+#include <chisel/chisel_fields_info.h>
 #endif
-#include "utils.h"
-#include "plugin.h"
-#include "plugin_manager.h"
+#include <libsinsp/utils.h>
+#include <libsinsp/plugin.h>
+#include <libsinsp/plugin_manager.h>
 
 #include "utils/sinsp_opener.h"
 #include "utils/plugin_utils.h"
@@ -1886,9 +1886,8 @@ sysdig_init_res sysdig_init(int argc, char **argv)
 			{
 				if (!inspector->suppress_events_comm(comm))
 				{
-					fprintf(stderr, "Could not add %s to the set of suppressed comms--did you specify more than %d values?\n",
-						comm.c_str(),
-						SCAP_MAX_SUPPRESSED_COMMS);
+					fprintf(stderr, "Could not add %s to the set of suppressed comms.\n",
+						comm.c_str());
 					res.m_res = EXIT_FAILURE;
 					goto exit;
 				}

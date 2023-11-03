@@ -32,15 +32,15 @@ limitations under the License.
 #include <set>
 using namespace std;
 
-#include "sinsp.h"
-#include "sinsp_int.h"
-#include "filter.h"
-#include "filterchecks.h"
+#include <libsinsp/sinsp.h>
+#include <libsinsp/sinsp_int.h>
+#include <libsinsp/filter.h>
+#include <libsinsp/filterchecks.h>
 
 #ifndef NOCURSESUI
 
 #include <curses.h>
-#include "chisel_table.h"
+#include <chisel/chisel_table.h>
 #include "cursescomponents.h"
 #include "cursestable.h"
 #include "cursesui.h"
