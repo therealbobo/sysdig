@@ -35,7 +35,7 @@ limitations under the License.
 #include <chisel/chisel_capture_interrupt_exception.h>
 #ifdef HAS_CAPTURE
 #ifndef WIN32
-#include "driver_config.h"
+#include <driver/driver_config.h>
 #endif // WIN32
 #endif // HAS_CAPTURE
 #include "sysdig.h"
@@ -240,28 +240,6 @@ static void usage()
 #endif
 " -j, --json         Emit output as json, data buffer encoding will depend from the\n"
 "                    print format selected.\n"
-#ifndef MINIMAL_BUILD
-" -k <url>, --k8s-api=<url>\n"
-"                    Enable Kubernetes support by connecting to the API server\n"
-"                    specified as argument. E.g. \"http://admin:password@127.0.0.1:8080\".\n"
-"                    The API server can also be specified via the environment variable\n"
-"                    SYSDIG_K8S_API.\n"
-" --node-name=<url>\n"
-"                    The node name is used as a filter when requesting metadata of pods\n"
-"                    to the API server; if empty, no filter is set\n"
-" -K <bt_file> | <cert_file>:<key_file[#password]>[:<ca_cert_file>], --k8s-api-cert=<bt_file> | <cert_file>:<key_file[#password]>[:<ca_cert_file>]\n"
-"                    Use the provided files names to authenticate user and (optionally) verify the K8S API\n"
-"                    server identity.\n"
-"                    Each entry must specify full (absolute, or relative to the current directory) path\n"
-"                    to the respective file.\n"
-"                    Private key password is optional (needed only if key is password protected).\n"
-"                    CA certificate is optional. For all files, only PEM file format is supported. \n"
-"                    Specifying CA certificate only is obsoleted - when single entry is provided \n"
-"                    for this option, it will be interpreted as the name of a file containing bearer token.\n"
-"                    Note that the format of this command-line option prohibits use of files whose names contain\n"
-"                    ':' or '#' characters in the file name.\n"
-"                    Option can also be provided via the environment variable SYSDIG_K8S_API_CERT.\n"
-#endif // MINIMAL_BUILD
 " -L, --list-events  List the events that the engine supports\n"
 " -l, --list         List the fields that can be used for filtering and output\n"
 "                    formatting. Use -lv to get additional information for each\n"
@@ -276,12 +254,6 @@ static void usage()
 " --log-level=<trace|debug|info|notice|warning|error|critical|fatal>\n"
 "                    Select log level. Useful together with --debug.\n"
 " --list-markdown    like -l, but produces markdown output\n"
-" -m <url[,marathon_url]>, --mesos-api=<url[,marathon_url]>\n"
-"                    Enable Mesos support by connecting to the API server\n"
-"                    specified as argument. E.g. \"http://admin:password@127.0.0.1:5050\".\n"
-"                    Marathon url is optional and defaults to Mesos address, port 8080.\n"
-"                    The API servers can also be specified via the environment variable\n"
-"                    SYSDIG_MESOS_API.\n"
 #ifdef HAS_MODERN_BPF
 "--modern-bpf\n"
 "                    Enable live capture using the modern BPF probe instead of the kernel module.\n"
@@ -300,7 +272,6 @@ static void usage()
 "                    Specify the format to be used when printing the events.\n"
 "                    With -pc or -pcontainer will use a container-friendly format.\n"
 "                    With -pk or -pkubernetes will use a kubernetes-friendly format.\n"
-"                    With -pm or -pmesos will use a mesos-friendly format.\n"
 "                    See the examples section below for more info.\n"
 " --plugin-info <pluginname>\n"
 "                    Print info for a single plugin. This includes name, author,\n"
@@ -385,11 +356,7 @@ static void usage()
 "fields listed by 'sysdig -l'.\n\n"
 "Using -pc or -pcontainer, the default format will be changed to a container-friendly one:\n\n"
 "%%evt.num %%evt.outputtime %%evt.cpu %%container.name (%%container.id) %%proc.name (%%thread.tid:%%thread.vtid) %%evt.dir %%evt.type %%evt.info\n\n"
-"Using -pk or -pkubernetes, the default format will be changed to a kubernetes-friendly one:\n\n"
-"%%evt.num %%evt.outputtime %%evt.cpu %%k8s.pod.name (%%container.id) %%proc.name (%%thread.tid:%%thread.vtid) %%evt.dir %%evt.type %%evt.info\n\n"
-"Using -pm or -pmesos, the default format will be changed to a mesos-friendly one:\n\n"
-"%%evt.num %%evt.outputtime %%evt.cpu %%mesos.task.name (%%container.id) %%proc.name (%%thread.tid:%%thread.vtid) %%evt.dir %%evt.type %%evt.info\n\n"
-"Examples:\n\n"
+"Examples:\n\name"
 " Capture all the events from the live system and print them to screen\n"
 "   $ sysdig\n\n"
 " Capture all the events from the live system and save them to disk\n"
@@ -1010,12 +977,6 @@ sysdig_init_res sysdig_init(int argc, char **argv)
 	bool filter_proclist_flag = false;
 	std::string cname;
 	std::vector<summary_table_entry> summary_table;
-#ifndef MINIMAL_BUILD
-	std::string* k8s_api = 0;
-	std::string* node_name = 0;
-	std::string* k8s_api_cert = 0;
-	std::string* mesos_api = 0;
-#endif // MINIMAL_BUILD
 	bool force_tracers_capture = false;
 	std::set<std::string> suppress_comms;
 #ifdef HAS_CAPTURE
@@ -1078,9 +1039,6 @@ sysdig_init_res sysdig_init(int argc, char **argv)
 		{"list-markdown", optional_argument, 0, 0 },
 		{"libs-version", no_argument, 0, 0},
 		{"log-level", required_argument, 0, 0 },
-#ifndef MINIMAL_BUILD
-		{"mesos-api", required_argument, 0, 'm'},
-#endif // MINIMAL_BUILD
 #ifdef HAS_MODERN_BPF
 		{"modern-bpf", no_argument, 0, 0 },
 #endif
@@ -1315,17 +1273,6 @@ sysdig_init_res sysdig_init(int argc, char **argv)
 				//
 				jflag = true;
 				break;
-#ifndef MINIMAL_BUILD
-			case 'k':
-				k8s_api = new std::string(optarg);
-				break;
-			case 'N':
-				node_name = new std::string(optarg);
-				break;
-			case 'K':
-				k8s_api_cert = new std::string(optarg);
-				break;
-#endif // MINIMAL_BUILD
 			case 'h':
 				usage();
 				return sysdig_init_res(EXIT_SUCCESS);
@@ -1340,11 +1287,6 @@ sysdig_init_res sysdig_init(int argc, char **argv)
 				// todo(jasondellaluce): support CLI for printing in markdown too
 				print_supported_events(inspector.get(), false);
 				return sysdig_init_res(EXIT_SUCCESS);
-#ifndef MINIMAL_BUILD
-			case 'm':
-				mesos_api = new std::string(optarg);
-				break;
-#endif // MINIMAL_BUILD
 			case 'M':
 				duration_to_tot = atoi(optarg);
 				if(duration_to_tot <= 0)
@@ -1401,16 +1343,6 @@ sysdig_init_res sysdig_init(int argc, char **argv)
 						inspector->set_print_container_data(true);
 					}
 				}
-				else if(std::string(optarg) == "m" || std::string(optarg) == "mesos")
-				{
-					output_format = "*%evt.num %evt.outputtime %evt.cpu %mesos.task.name (%container.id) %proc.name (%thread.tid:%thread.vtid) %evt.dir %evt.type %evt.info";
-
-					// This enables chisels to determine if they should print container information
-					if(inspector != NULL)
-					{
-						inspector->set_print_container_data(true);
-					}
-				}
 				else
 				{
 					output_format = optarg;
@@ -1426,10 +1358,6 @@ sysdig_init_res sysdig_init(int argc, char **argv)
 				break;
 			case 'r':
 				infiles.emplace_back(optarg);
-#ifndef MINIMAL_BUILD
-				k8s_api = new std::string();
-				mesos_api = new std::string();
-#endif // MINIMAL_BUILD
 				break;
 			case 'S':
 				for(uint32_t j = 0; j < PPM_EVENT_MAX; j++)
@@ -1943,64 +1871,6 @@ sysdig_init_res sysdig_init(int argc, char **argv)
 			//
 			chisels_on_capture_start();
 
-#ifndef MINIMAL_BUILD
-			//
-			// run k8s, if required
-			//
-			if(k8s_api)
-			{
-				if(!k8s_api_cert)
-				{
-					if(char* k8s_cert_env = getenv("SYSDIG_K8S_API_CERT"))
-					{
-						k8s_api_cert = new std::string(k8s_cert_env);
-					}
-				}
-				inspector->init_k8s_client(k8s_api, k8s_api_cert, node_name, verbose);
-				k8s_api = 0;
-				k8s_api_cert = 0;
-			}
-			else if(char* k8s_api_env = getenv("SYSDIG_K8S_API"))
-			{
-				if(k8s_api_env != NULL)
-				{
-					if(!k8s_api_cert)
-					{
-						if(char* k8s_cert_env = getenv("SYSDIG_K8S_API_CERT"))
-						{
-							k8s_api_cert = new std::string(k8s_cert_env);
-						}
-					}
-					k8s_api = new std::string(k8s_api_env);
-					inspector->init_k8s_client(k8s_api, k8s_api_cert, node_name, verbose);
-				}
-				else
-				{
-					delete k8s_api;
-					delete k8s_api_cert;
-				}
-				k8s_api = 0;
-				k8s_api_cert = 0;
-			}
-
-			//
-			// run mesos, if required
-			//
-			if(mesos_api)
-			{
-				inspector->init_mesos_client(mesos_api, verbose);
-			}
-			else if(char* mesos_api_env = getenv("SYSDIG_MESOS_API"))
-			{
-				if(mesos_api_env != NULL)
-				{
-					mesos_api = new std::string(mesos_api_env);
-					inspector->init_mesos_client(mesos_api, verbose);
-				}
-			}
-			delete mesos_api;
-			mesos_api = 0;
-#endif
 #ifndef _WIN32
 			// Sysdig does not accept user input during the inspect loop
 			// If the user stops the program with Ctrl-C disabling input would prevent the echoed ^C

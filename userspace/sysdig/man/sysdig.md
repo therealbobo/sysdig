@@ -153,12 +153,6 @@ OPTIONS
 **-j**, **--json**
   Emit output as json, data buffer encoding will depend from the print format selected.
 
-**-k**, **--k8s-api**
-  Enable Kubernetes support by connecting to the API server specified as argument. E.g. "http://admin:password@127.0.0.1:8080". The API server can also be specified via the environment variable SYSDIG_K8S_API.
-
-**-K** _btfile | certfile:keyfile[#password][:cacertfile]_, **--k8s-api-cert=**_btfile | certfile:keyfile[#password][:cacertfile]_
-  Use the provided files names to authenticate user and (optionally) verify the K8S API server identity. Each entry must specify full (absolute, or relative to the current directory) path to the respective file. Private key password is optional (needed only if key is password protected). CA certificate is optional. For all files, only PEM file format is supported. Specifying CA certificate only is obsoleted - when single entry is provided for this option, it will be interpreted as the name of a file containing bearer token. Note that the format of this command-line option prohibits use of files whose names contain ':' or '#' characters in the file name. Option can also be provided via the environment variable SYSDIG_K8S_API_CERT.
-
 **-L**, **--list-events**
   List the events that the engine supports
   
@@ -167,9 +161,6 @@ OPTIONS
 
 **--list-markdown**
   Like -l, but produces markdown output
-
-**-m** _url[,marathon-url]_, **--mesos-api=**_url[,marathon-url]_
-  Enable Mesos support by connecting to the API server specified as argument (e.g. http://admin:password@127.0.0.1:5050). Mesos url is required. Marathon url is optional, defaulting to auto-follow - if Marathon API server is not provided, sysdig will attempt to retrieve (and subsequently follow, if it migrates) the location of Marathon API server from the Mesos master. Note that, with auto-follow, sysdig will likely receive a cluster internal IP address for Marathon API server, so running sysdig with Marathon auto-follow from a node that is not part of Mesos cluster may not work. Additionally, running sysdig with Mesos support on a node that has no containers managed by Mesos is of limited use because, although cluster metadata will be collected, there will be no Mesos/Marathon filtering capability. The API servers can also be specified via the environment variable SYSDIG_MESOS_API.
 
 **-M** _num_seconds_
   Stop collecting after reaching <num_seconds>
@@ -184,7 +175,7 @@ OPTIONS
   Print progress on stderr while processing trace files.
   
 **-p** _outputformat_, **--print**=_outputformat_  
-  Specify the format to be used when printing the events. With -pc or -pcontainer will use a container-friendly format. With -pk or -pkubernetes will use a kubernetes-friendly format. With -pm or -pmesos will use a mesos-friendly format. Specifying **-pp** on the command line will cause sysdig to print the default command line format and exit.
+  Specify the format to be used when printing the events. With -pc or -pcontainer will use a container-friendly format. Specifying **-pp** on the command line will cause sysdig to print the default command line format and exit.
   
 **-q**, **--quiet**  
   Don't print events on the screen. Useful when dumping to disk.

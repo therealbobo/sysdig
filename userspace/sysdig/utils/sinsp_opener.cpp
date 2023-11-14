@@ -25,7 +25,7 @@ limitations under the License.
 #include <libsinsp/sinsp_exception.h>
 #ifdef HAS_CAPTURE
 #ifndef WIN32
-#include "driver_config.h"
+#include <driver/driver_config.h>
 #endif // WIN32
 #endif // HAS_CAPTURE
 
