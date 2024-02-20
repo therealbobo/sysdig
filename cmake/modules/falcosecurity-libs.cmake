@@ -32,8 +32,8 @@ else()
   # In case you want to test against another falcosecurity/libs version (or branch, or commit) just pass the variable -
   # ie., `cmake -DFALCOSECURITY_LIBS_VERSION=dev ..`
   if(NOT FALCOSECURITY_LIBS_VERSION)
-    set(FALCOSECURITY_LIBS_VERSION "0.15.1")
-    set(FALCOSECURITY_LIBS_CHECKSUM "SHA256=8c2596fec3c25e9718a8b357b0504450cd26efbe653b79afcd66a8405f0dc08c")
+    set(FALCOSECURITY_LIBS_VERSION "fd8c5341ed7489649e5f536b53317eb4e16479c6")
+    set(FALCOSECURITY_LIBS_CHECKSUM "SHA256=0e51fcdf3a9499f0492a4286a6f80b958c93f9588b08bdecd94fdc0202339d45")
   endif()
 
   # cd /path/to/build && cmake /path/to/source
@@ -70,9 +70,6 @@ set(BUILD_LIBSCAP_MODERN_BPF ${BUILD_SYSDIG_MODERN_BPF} CACHE BOOL "")
 # explicitly disable the tests/examples of this dependency
 set(CREATE_TEST_TARGETS OFF CACHE BOOL "")
 set(BUILD_LIBSCAP_EXAMPLES OFF CACHE BOOL "")
-
-set(WITH_CHISEL ON CACHE INTERNAL "" FORCE)
-set(CHISEL_TOOL_LIBRARY_NAME "sysdig")
 
 set(USE_BUNDLED_TBB ON CACHE BOOL "")
 set(USE_BUNDLED_B64 ON CACHE BOOL "")
