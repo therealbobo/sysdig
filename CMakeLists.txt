@@ -146,7 +146,7 @@ endif()
 
 # Modern BPF is not supported on not Linux systems and in MINIMAL_BUILD
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
-	option(BUILD_SYSDIG_MODERN_BPF "Build modern BPF support for Sysdig" OFF)
+	option(BUILD_SYSDIG_MODERN_BPF "Build modern BPF support for Sysdig" ON)
 	if(BUILD_SYSDIG_MODERN_BPF)
 		add_definitions(-DHAS_MODERN_BPF)
 	endif()
