@@ -40,6 +40,7 @@ project(sysdig)
 option(MINIMAL_BUILD "Produce a minimal sysdig binary with only the essential features (no eBPF probe driver, no kubernetes, no mesos, no marathon and no container metadata)" OFF)
 option(MUSL_OPTIMIZED_BUILD "Enable if you want a musl optimized build" OFF)
 option(USE_BUNDLED_DEPS "Enable bundled dependencies instead of using the system ones" ON)
+option(BUILD_NEW_SCAP_DRIVER_LOADER "Enable new go scap-driver-loader" OFF)
 
 # Add path for custom CMake modules.
 list(APPEND CMAKE_MODULE_PATH
@@ -191,6 +192,9 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
 endif()
 
 add_subdirectory(userspace/sysdig)
+if(BUILD_NEW_SCAP_DRIVER_LOADER)
+	add_subdirectory(userspace/driver-loader)
+endif()
 
 set(CPACK_PACKAGE_NAME "${PACKAGE_NAME}")
 set(CPACK_PACKAGE_VENDOR "Sysdig Inc.")

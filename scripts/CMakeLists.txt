@@ -33,5 +33,10 @@ install(FILES completions/zsh/_sysdig
 install(FILES completions/zsh/_sysdig
 	DESTINATION share/zsh/site-functions COMPONENT "${SYSDIG_COMPONENT_NAME}")
 
-install(PROGRAMS "${CMAKE_BINARY_DIR}/scripts/scap-driver-loader"
-	DESTINATION bin COMPONENT "${SYSDIG_COMPONENT_NAME}")
+if(BUILD_NEW_SCAP_DRIVER_LOADER)
+	install(PROGRAMS "${CMAKE_BINARY_DIR}/userspace/driver-loader/scap-driver-loader"
+		DESTINATION bin COMPONENT "${SYSDIG_COMPONENT_NAME}")
+else()
+	install(PROGRAMS "${CMAKE_BINARY_DIR}/scripts/scap-driver-loader"
+		DESTINATION bin COMPONENT "${SYSDIG_COMPONENT_NAME}")
+endif()
