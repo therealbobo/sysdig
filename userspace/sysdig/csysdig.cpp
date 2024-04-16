@@ -333,8 +333,19 @@ captureinfo do_inspect(sinsp* inspector,
 			}
 			else
 			{
+				//
+				// scap file truncated.
+				//
+				// We fail gracefully:
+				// - all the expected output (except truncated
+				//   events) will be on stdout
+				// - the return code will be set as success
+				// - the inspector error will be on stderr
+				//
 				ui->set_truncated_input(true);
 				res = SCAP_EOF;
+				std::cerr << inspector->getlasterr() << std::endl;
+				continue;
 			}
 		}
 

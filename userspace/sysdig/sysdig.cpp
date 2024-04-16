@@ -790,7 +790,21 @@ captureinfo do_inspect(sinsp* inspector,
 		{
 			dumper->dump(ev);
 		}
-
+		else if(res == SCAP_FAILURE && !inspector->is_live())
+		{
+			//
+			// scap file truncated.
+			//
+			// We fail gracefully:
+			// - all the expected output (except truncated
+			//   events) will be on stdout
+			// - the return code will be set as success
+			// - the inspector error will be on stderr
+			//
+			handle_end_of_file(inspector, print_progress, reset_colors, formatter);
+			std::cerr << inspector->getlasterr() << std::endl;
+			break;
+		}
 		if(res == SCAP_TIMEOUT || res == SCAP_FILTERED_EVENT)
 		{
 			if(res == SCAP_FILTERED_EVENT && ev != NULL && ev->is_filtered_out())
