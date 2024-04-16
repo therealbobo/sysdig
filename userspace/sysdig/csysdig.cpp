@@ -343,9 +343,8 @@ captureinfo do_inspect(sinsp* inspector,
 				// - the inspector error will be on stderr
 				//
 				ui->set_truncated_input(true);
-				res = SCAP_EOF;
 				std::cerr << inspector->getlasterr() << std::endl;
-				continue;
+				break;
 			}
 		}
 
