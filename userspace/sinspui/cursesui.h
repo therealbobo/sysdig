@@ -628,18 +628,14 @@ public:
 			{
 				std::string jdata = m_json_spy_renderer->get_data();
 				double rprogress = m_inspector->get_read_progress();
-				printf("{\"progress\": %.2lf,", rprogress);
-				if(next_res == SCAP_EOF)
-				{
-					printf(" \"count\": %" PRIu64 ", ", m_json_spy_renderer->get_count());
-				}
-				printf("\"data\": %s", jdata.c_str());
-				printf("}");
-
-				if(next_res != SCAP_EOF)
+				if(ts > m_1st_evt_ts)
 				{
 					printf(",");
 				}
+				printf("{\"progress\": %.2lf, \"count\": %" PRIu64 ", \"data\": %s}",
+					   rprogress,
+					   m_json_spy_renderer->get_count(),
+					   jdata.c_str());
 
 				fflush(stdout);
 
