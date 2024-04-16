@@ -100,7 +100,11 @@ void json_spy_renderer::set_filter(string filter)
 void json_spy_renderer::process_event_spy(sinsp_evt* evt, int32_t next_res)
 {
 	int64_t len;
-	const char* argstr = m_json_spy_renderer->process_event_spy(evt, &len);
+	const char* argstr = NULL;
+	if(next_res != SCAP_EOF)
+	{
+		argstr = m_json_spy_renderer->process_event_spy(evt, &len);
+	}
 
 	if(argstr != NULL)
 	{
@@ -167,6 +171,11 @@ void json_spy_renderer::process_event_spy(sinsp_evt* evt, int32_t next_res)
 
 void json_spy_renderer::process_event_dig(sinsp_evt* evt, int32_t next_res)
 {
+	if(next_res == SCAP_EOF)
+	{
+		return;
+	}
+
 	if(!m_inspector->is_debug_enabled() && evt->get_category() & EC_INTERNAL)
 	{
 		return;
@@ -184,7 +193,7 @@ void json_spy_renderer::process_event(sinsp_evt* evt, int32_t next_res)
 	//
 	// Filter the event
 	//
-	if(m_filter)
+	if(m_filter && next_res != SCAP_EOF)
 	{
 		if(!m_filter->run(evt))
 		{
@@ -1452,7 +1461,7 @@ void sinsp_cursesui::handle_end_of_sample(sinsp_evt* evt, int32_t next_res)
 	// It's time to refresh the data for this chart.
 	// First of all, create the data for the chart
 	//
-	if(m_output_type == chisel_table::OT_JSON && (m_inspector->is_live() || (m_eof > 0)))
+	if(m_output_type == chisel_table::OT_JSON && (m_inspector->is_live() || next_res == SCAP_EOF))
 	{
 		printf("{\"progress\": 100, ");
 
@@ -1527,28 +1536,6 @@ void sinsp_cursesui::handle_end_of_sample(sinsp_evt* evt, int32_t next_res)
 		render();
 	}
 #endif
-	//
-	// If this is a trace file, check if we reached the end of the file.
-	// Or, if we are in replay mode, wait for a key press before processing
-	// the next sample.
-	//
-	if(!m_inspector->is_live())
-	{
-#ifndef NOCURSESUI
-/*
-		if(m_output_type == chisel_table::OT_CURSES)
-		{
-			if(m_offline_replay)
-			{
-				while(getch() != ' ')
-				{
-					usleep(10000);
-				}
-			}
-		}
-*/		
-#endif
-	}
 }
 
 void sinsp_cursesui::restart_capture(bool is_spy_switch)

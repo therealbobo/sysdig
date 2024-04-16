@@ -474,15 +474,19 @@ public:
 	//
 	inline bool process_event(sinsp_evt* evt, int32_t next_res)
 	{
-		uint64_t ts = evt->get_ts();
-		if(!m_inspector->is_live())
+		uint64_t ts = 0;
+		if(next_res != SCAP_EOF)
 		{
-			if(m_1st_evt_ts == 0)
+			ts = evt->get_ts();
+			if(!m_inspector->is_live())
 			{
-				m_1st_evt_ts = ts;	
-			}
+				if(m_1st_evt_ts == 0)
+				{
+					m_1st_evt_ts = ts;
+				}
 
-			m_last_evt_ts = ts;	
+				m_last_evt_ts = ts;
+			}
 		}
 
 		//
@@ -570,12 +574,15 @@ public:
 			//
 			if(!m_inspector->is_live() && !m_offline_replay)
 			{
-				uint64_t evtnum = evt->get_num();
-				if(evtnum - m_last_progress_evt > 300000)
+				if(next_res != SCAP_EOF)
 				{
-				 	printf("{\"progress\": %.2lf},\n", m_inspector->get_read_progress());
-					fflush(stdout);
-					m_last_progress_evt = evtnum;
+					uint64_t evtnum = evt->get_num();
+					if(evtnum - m_last_progress_evt > 300000)
+					{
+						printf("{\"progress\": %.2lf},\n", m_inspector->get_read_progress());
+						fflush(stdout);
+						m_last_progress_evt = evtnum;
+					}
 				}
 			}
 		}
@@ -622,13 +629,12 @@ public:
 		if(m_json_spy_renderer)
 		{
 			m_json_spy_renderer->process_event(evt, next_res);
-			
-			uint64_t evtnum = evt->get_num();
-			if((evtnum - m_last_progress_evt > 2000) || (next_res == SCAP_EOF))
+
+			if(next_res == SCAP_EOF || (evt->get_num() - m_last_progress_evt > 2000))
 			{
 				std::string jdata = m_json_spy_renderer->get_data();
 				double rprogress = m_inspector->get_read_progress();
-				if(ts > m_1st_evt_ts)
+				if(ts > m_1st_evt_ts || next_res == SCAP_EOF)
 				{
 					printf(",");
 				}
@@ -639,7 +645,10 @@ public:
 
 				fflush(stdout);
 
-				m_last_progress_evt = evtnum;
+				if(next_res != SCAP_EOF)
+				{
+					m_last_progress_evt = evt->get_num();
+				}
 			}
 
 			//
@@ -675,18 +684,15 @@ public:
 				//
 				// For files, we flush only once, at the end of the capture.
 				//
-				if(next_res == SCAP_EOF)
-				{
-					end_of_sample = true;
-				}
-				else
-				{
-					end_of_sample = false;
-				}
+				end_of_sample = (next_res == SCAP_EOF);
 			}
 
 			if(end_of_sample)
 			{
+				if(next_res == SCAP_EOF && !m_inspector->is_live())
+				{
+					evt = nullptr;
+				}
 				handle_end_of_sample(evt, next_res);
 
 				//
@@ -696,7 +702,7 @@ public:
 				{
 					ASSERT(!m_inspector->is_live());
 					m_eof++;
-					return false;
+					return true;
 				}
 			}
 
