@@ -184,7 +184,7 @@ void json_spy_renderer::process_event(sinsp_evt* evt, int32_t next_res)
 	//
 	// Filter the event
 	//
-	if(m_filter)
+	if(m_filter && next_res != SCAP_EOF)
 	{
 		if(!m_filter->run(evt))
 		{
@@ -1446,10 +1446,7 @@ Json::Value sinsp_cursesui::generate_json_info_section()
 void sinsp_cursesui::handle_end_of_sample(sinsp_evt* evt, int32_t next_res)
 {
 	vector<chisel_sample_row>* sample;
-	if(next_res != SCAP_EOF)
-	{
-		m_datatable->flush(evt);
-	}
+	m_datatable->flush(evt);
 
 	//
 	// It's time to refresh the data for this chart.

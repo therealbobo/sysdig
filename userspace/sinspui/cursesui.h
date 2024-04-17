@@ -593,6 +593,7 @@ public:
 		// but we stop the processing here. We also make sure to sleep a bit to keep the 
 		// CPU under control. 
 		//
+		/*
 		if(m_eof > 1)
 		{
 #ifndef NOCURSESUI
@@ -615,6 +616,7 @@ public:
 				return false;
 			}
 		}
+		*/
 
 		//
 		// Perform event processing
@@ -629,7 +631,7 @@ public:
 		if(m_json_spy_renderer)
 		{
 			m_json_spy_renderer->process_event(evt, next_res);
-			
+
 			if(next_res == SCAP_EOF || (evt->get_num() - m_last_progress_evt > 2000))
 			{
 				std::string jdata = m_json_spy_renderer->get_data();
