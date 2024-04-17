@@ -294,7 +294,8 @@ static void print_views(chisel_view_manager* view_manager)
 
 captureinfo do_inspect(sinsp* inspector,
 					   uint64_t cnt,
-					   sinsp_cursesui* ui)
+					   sinsp_cursesui* ui,
+					   const chisel_table::output_type& output_type)
 {
 	captureinfo retval;
 	int32_t res;
@@ -343,7 +344,10 @@ captureinfo do_inspect(sinsp* inspector,
 				// - the inspector error will be on stderr
 				//
 				ui->set_truncated_input(true);
-				std::cerr << inspector->getlasterr() << std::endl;
+				if(output_type != chisel_table::OT_CURSES)
+				{
+					std::cerr << inspector->getlasterr() << std::endl;
+				}
 				res = SCAP_EOF;
 			}
 		}
@@ -999,7 +1003,8 @@ sysdig_init_res csysdig_init(int argc, char **argv)
 			//
 			cinfo = do_inspect(inspector,
 				cnt,
-				&ui);
+				&ui,
+				output_type);
 
 			if(output_type == chisel_table::OT_JSON)
 			{

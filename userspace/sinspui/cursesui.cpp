@@ -1455,7 +1455,7 @@ Json::Value sinsp_cursesui::generate_json_info_section()
 void sinsp_cursesui::handle_end_of_sample(sinsp_evt* evt, int32_t next_res)
 {
 	vector<chisel_sample_row>* sample;
-	m_datatable->flush(evt);
+	m_datatable->flush(evt, m_last_evt_ts);
 
 	//
 	// It's time to refresh the data for this chart.
