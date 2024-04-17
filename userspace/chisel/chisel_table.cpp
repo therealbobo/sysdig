@@ -510,7 +510,7 @@ void chisel_table::process_event(sinsp_evt* evt)
 	return;
 }
 
-void chisel_table::process_proctable(sinsp_evt* evt)
+void chisel_table::process_proctable(sinsp_evt* evt, uint64_t last_evt_ts)
 {
 	sinsp_evt tevt;
 	scap_evt tscapevt;
@@ -518,7 +518,15 @@ void chisel_table::process_proctable(sinsp_evt* evt)
 	threadinfo_map_t* threadtable  = m_inspector->m_thread_manager->get_threads();
 	ASSERT(threadtable != NULL);
 
-	uint64_t ts = evt->get_ts();
+	uint64_t ts;
+	if(evt)
+	{
+		ts = evt->get_ts();
+	}
+	else
+	{
+		ts = last_evt_ts;
+	}
 	uint64_t ts_s = ts - (ts % ONE_SECOND_IN_NS);
 	tscapevt.ts = ts_s - 1;
 
@@ -555,7 +563,7 @@ void chisel_table::process_proctable(sinsp_evt* evt)
 	});
 }
 
-void chisel_table::flush(sinsp_evt* evt)
+void chisel_table::flush(sinsp_evt* evt, uint64_t last_evt_ts)
 {
 	if(!m_paused)
 	{
@@ -565,10 +573,7 @@ void chisel_table::flush(sinsp_evt* evt)
 			// Time to emit the sample!
 			// Add the proctable as a sample at the end of the second
 			//
-			if(evt)
-			{
-				process_proctable(evt);
-			}
+			process_proctable(evt);
 
 			//
 			// If there is a merging step, switch the types to point to the merging ones.
