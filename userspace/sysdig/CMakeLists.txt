@@ -21,6 +21,7 @@ if(NOT WIN32)
 endif() # NOT WIN32
 
 include(zlib)
+include(luajit)
 
 include_directories("${PROJECT_BINARY_DIR}/userspace/sinspui")
 include_directories(../sinspui)
@@ -60,6 +61,17 @@ list(APPEND SOURCE_FILES_CSYSDIG
 	../sinspui/cursestable.cpp
 	../sinspui/cursesui.cpp)
 
+list(APPEND CHISEL_SOURCES
+	../chisel/chisel_api.cpp
+	../chisel/chisel_fields_info.cpp
+	../chisel/chisel_utils.cpp
+	../chisel/chisel.cpp
+	../chisel/chisel_viewinfo.cpp
+	../chisel/chisel_table.cpp)
+
+list(APPEND SOURCE_FILES ${CHISEL_SOURCES})
+list(APPEND SOURCE_FILES_CSYSDIG ${CHISEL_SOURCES})
+
 add_executable(sysdig ${SOURCE_FILES})
 add_executable(csysdig ${SOURCE_FILES_CSYSDIG})
 
@@ -68,25 +80,36 @@ if(USE_BUNDLED_DEPS)
 	add_dependencies(csysdig njson)
 	add_dependencies(sysdig yaml-cpp)
 	add_dependencies(csysdig yaml-cpp)
+	add_dependencies(sysdig luajit)
+	add_dependencies(csysdig luajit)
 endif()
 
 target_include_directories(
 	sysdig
 	PUBLIC
 		"${YAMLCPP_INCLUDE_DIR}"
-		"${NJSON_INCLUDE_DIR}")
+		"${NJSON_INCLUDE_DIR}"
+		"${LUAJIT_INCLUDE}"
+		../chisel
+		..
+	)
 
 target_include_directories(
 	csysdig
 	PUBLIC
 		"${YAMLCPP_INCLUDE_DIR}"
-		"${NJSON_INCLUDE_DIR}")
+		"${NJSON_INCLUDE_DIR}"
+		"${LUAJIT_INCLUDE}"
+		../chisel
+		..
+	)
 
 if(NOT WIN32)
 	include_directories(${PROJECT_BINARY_DIR}/driver/src)
 
 	target_link_libraries(sysdig
 		sinsp
+		"${LUAJIT_LIB}"
 		"${YAMLCPP_LIB}")
 
 	if(USE_BUNDLED_NCURSES)
@@ -95,6 +118,7 @@ if(NOT WIN32)
 
 	target_link_libraries(csysdig
 		sinsp
+		"${LUAJIT_LIB}"
 		"${CURSES_LIBRARIES}"
 		"${YAMLCPP_LIB}")
 
@@ -113,26 +137,26 @@ if(NOT WIN32)
 		DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 
 else()
-	include(luajit)
-
 	add_definitions(-DNOCURSESUI)
 
 	target_link_libraries(sysdig
 		sinsp
+		"${LUAJIT_LIB}"
 		"${YAMLCPP_LIB}")
 
 	target_link_libraries(csysdig
 		sinsp
+		"${LUAJIT_LIB}"
 		"${YAMLCPP_LIB}")
 
 	target_link_libraries(sysdig odbc32.lib odbccp32.lib Netapi32.lib Iphlpapi.lib)
 
 	target_link_libraries(csysdig odbc32.lib odbccp32.lib Netapi32.lib Iphlpapi.lib)
 
-	add_custom_command(TARGET sysdig POST_BUILD
-		COMMAND "${CMAKE_COMMAND}" -E copy_if_different
-			"${LUAJIT_SRC}/lua51.dll"
-			"${PROJECT_BINARY_DIR}/$(Configuration)/lua51.dll")
+	#add_custom_command(TARGET sysdig POST_BUILD
+	#	COMMAND "${CMAKE_COMMAND}" -E copy_if_different
+	#		"${LUAJIT_SRC}/lua51.dll"
+	#		"${PROJECT_BINARY_DIR}/$(Configuration)/lua51.dll")
 
 	add_custom_command(TARGET sysdig POST_BUILD
 		COMMAND "${CMAKE_COMMAND}" -E copy_directory
@@ -161,9 +185,9 @@ else()
 			DESTINATION programs
 			COMPONENT "${SYSDIG_COMPONENT_NAME}")
 
-	install(FILES "${LUAJIT_SRC}/lua51.dll"
-			DESTINATION programs
-			COMPONENT "${SYSDIG_COMPONENT_NAME}")
+		#install(FILES "${LUAJIT_SRC}/lua51.dll"
+		#		DESTINATION programs
+		#		COMPONENT "${SYSDIG_COMPONENT_NAME}")
 
 endif()
 
