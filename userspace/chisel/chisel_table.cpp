@@ -552,13 +552,16 @@ void chisel_table::flush(sinsp_evt* evt)
 {
 	if(!m_paused)
 	{
-		if(m_next_flush_time_ns != 0)
+		if(m_next_flush_time_ns != 0 || evt == nullptr)
 		{
 			//
 			// Time to emit the sample!
 			// Add the proctable as a sample at the end of the second
 			//
-			process_proctable(evt);
+			if(evt)
+			{
+				process_proctable(evt);
+			}
 
 			//
 			// If there is a merging step, switch the types to point to the merging ones.
@@ -600,10 +603,13 @@ void chisel_table::flush(sinsp_evt* evt)
 		}
 	}
 
-	uint64_t ts = evt->get_ts();
+	if(evt)
+	{
+		uint64_t ts = evt->get_ts();
 
-	m_prev_flush_time_ns = m_next_flush_time_ns;
-	m_next_flush_time_ns = ts - (ts % m_refresh_interval_ns) + m_refresh_interval_ns;
+		m_prev_flush_time_ns = m_next_flush_time_ns;
+		m_next_flush_time_ns = ts - (ts % m_refresh_interval_ns) + m_refresh_interval_ns;
+	}
 
 	return;
 }

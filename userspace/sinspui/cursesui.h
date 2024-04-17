@@ -691,6 +691,10 @@ public:
 
 			if(end_of_sample)
 			{
+				if(next_res == SCAP_EOF && !m_inspector->is_live())
+				{
+					evt = nullptr;
+				}
 				handle_end_of_sample(evt, next_res);
 
 				//
