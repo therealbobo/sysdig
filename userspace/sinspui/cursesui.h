@@ -686,14 +686,7 @@ public:
 				//
 				// For files, we flush only once, at the end of the capture.
 				//
-				if(next_res == SCAP_EOF)
-				{
-					end_of_sample = true;
-				}
-				else
-				{
-					end_of_sample = false;
-				}
+				end_of_sample = (next_res == SCAP_EOF);
 			}
 
 			if(end_of_sample)
@@ -707,7 +700,7 @@ public:
 				{
 					ASSERT(!m_inspector->is_live());
 					m_eof++;
-					return false;
+					return true;
 				}
 			}
 

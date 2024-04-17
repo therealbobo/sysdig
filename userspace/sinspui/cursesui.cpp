@@ -1452,7 +1452,7 @@ void sinsp_cursesui::handle_end_of_sample(sinsp_evt* evt, int32_t next_res)
 	// It's time to refresh the data for this chart.
 	// First of all, create the data for the chart
 	//
-	if(m_output_type == chisel_table::OT_JSON && (m_inspector->is_live() || (m_eof > 0)))
+	if(m_output_type == chisel_table::OT_JSON && (m_inspector->is_live() || next_res == SCAP_EOF))
 	{
 		printf("{\"progress\": 100, ");
 
@@ -1527,28 +1527,6 @@ void sinsp_cursesui::handle_end_of_sample(sinsp_evt* evt, int32_t next_res)
 		render();
 	}
 #endif
-	//
-	// If this is a trace file, check if we reached the end of the file.
-	// Or, if we are in replay mode, wait for a key press before processing
-	// the next sample.
-	//
-	if(!m_inspector->is_live())
-	{
-#ifndef NOCURSESUI
-/*
-		if(m_output_type == chisel_table::OT_CURSES)
-		{
-			if(m_offline_replay)
-			{
-				while(getch() != ' ')
-				{
-					usleep(10000);
-				}
-			}
-		}
-*/		
-#endif
-	}
 }
 
 void sinsp_cursesui::restart_capture(bool is_spy_switch)
