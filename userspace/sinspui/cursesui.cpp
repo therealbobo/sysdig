@@ -1536,6 +1536,28 @@ void sinsp_cursesui::handle_end_of_sample(sinsp_evt* evt, int32_t next_res)
 		render();
 	}
 #endif
+	//
+	// If this is a trace file, check if we reached the end of the file.
+	// Or, if we are in replay mode, wait for a key press before processing
+	// the next sample.
+	//
+	if(!m_inspector->is_live())
+	{
+#ifndef NOCURSESUI
+/*
+		if(m_output_type == chisel_table::OT_CURSES)
+		{
+			if(m_offline_replay)
+			{
+				while(getch() != ' ')
+				{
+					usleep(10000);
+				}
+			}
+		}
+*/
+#endif
+	}
 }
 
 void sinsp_cursesui::restart_capture(bool is_spy_switch)
