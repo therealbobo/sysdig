@@ -279,6 +279,7 @@ sinsp_cursesui::sinsp_cursesui(sinsp* inspector,
 	m_sorting_col = sorting_col;
 	m_json_spy_renderer = NULL;
 	m_json_spy_text_fmt = json_spy_text_fmt;
+	m_n_progress_reports = 0;
 
 #ifndef NOCURSESUI
 	m_viz = NULL;
