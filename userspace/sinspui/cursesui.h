@@ -637,7 +637,7 @@ public:
 			{
 				std::string jdata = m_json_spy_renderer->get_data();
 				double rprogress = m_inspector->get_read_progress();
-				if(ts > m_1st_evt_ts || next_res == SCAP_EOF)
+				if(ts > m_1st_evt_ts || (next_res == SCAP_EOF && m_n_progress_reports > 0))
 				{
 					// We add the comma only after the first progress status update.
 					printf(",");
@@ -646,15 +646,16 @@ public:
 					   rprogress,
 					   m_json_spy_renderer->get_count(),
 					   jdata.c_str());
+				m_n_progress_reports++;
 
 				fflush(stdout);
+			}
 
-				if(next_res != SCAP_EOF)
-				{
-					// We update the value only if we have
-					// an event.
-					m_last_progress_evt = evt->get_num();
-				}
+			if(next_res != SCAP_EOF)
+			{
+				// We update the value only if we have
+				// an event.
+				m_last_progress_evt = evt->get_num();
 			}
 
 			//
@@ -826,5 +827,6 @@ private:
 	int32_t m_sorting_col;
 	json_spy_renderer* m_json_spy_renderer;
 	sinsp_evt::param_fmt m_json_spy_text_fmt;
+	uint64_t m_n_progress_reports;
 };
 
