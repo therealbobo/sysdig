@@ -639,6 +639,7 @@ public:
 				double rprogress = m_inspector->get_read_progress();
 				if(ts > m_1st_evt_ts || next_res == SCAP_EOF)
 				{
+					// We add the comma only after the first progress status update.
 					printf(",");
 				}
 				printf("{\"progress\": %.2lf, \"count\": %" PRIu64 ", \"data\": %s}",
@@ -650,6 +651,8 @@ public:
 
 				if(next_res != SCAP_EOF)
 				{
+					// We update the value only if we have
+					// an event.
 					m_last_progress_evt = evt->get_num();
 				}
 			}

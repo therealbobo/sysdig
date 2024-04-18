@@ -519,6 +519,9 @@ void chisel_table::process_proctable(sinsp_evt* evt, uint64_t last_evt_ts)
 	ASSERT(threadtable != NULL);
 
 	uint64_t ts;
+	// If the evt is null we got a SCAP_EOF return code.
+	// Given that the timestamp is the one of the last
+	// event received.
 	if(evt)
 	{
 		ts = evt->get_ts();
@@ -567,6 +570,7 @@ void chisel_table::flush(sinsp_evt* evt, uint64_t last_evt_ts)
 {
 	if(!m_paused)
 	{
+		// If the evt is null we got a SCAP_EOF return code.
 		if(m_next_flush_time_ns != 0 || evt == nullptr)
 		{
 			//
@@ -615,6 +619,8 @@ void chisel_table::flush(sinsp_evt* evt, uint64_t last_evt_ts)
 		}
 	}
 
+	// If the evt is null we got a SCAP_EOF return code.
+	// So we don't have to update any value.
 	if(evt)
 	{
 		uint64_t ts = evt->get_ts();

@@ -346,6 +346,9 @@ captureinfo do_inspect(sinsp* inspector,
 				ui->set_truncated_input(true);
 				if(output_type != chisel_table::OT_CURSES)
 				{
+					// If we are in the TUI, we don't write anything
+					// to stderr: the curses interface will display
+					// the trucanted status.
 					std::cerr << inspector->getlasterr() << std::endl;
 				}
 				res = SCAP_EOF;
