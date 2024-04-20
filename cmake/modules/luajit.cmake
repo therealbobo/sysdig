@@ -79,6 +79,18 @@ else()
 					BUILD_IN_SOURCE 1
 					BUILD_BYPRODUCTS ${LUAJIT_LIB}
 					INSTALL_COMMAND "")
+			elseif(EMSCRIPTEN)
+				ExternalProject_Add(luajit
+					PREFIX "${PROJECT_BINARY_DIR}/luajit-prefix"
+					GIT_REPOSITORY "https://github.com/lua/lua"
+					GIT_TAG "v5.4.6"
+					CONFIGURE_COMMAND ""
+					BUILD_COMMAND emmake make CC=emcc
+					BUILD_IN_SOURCE 1
+					BUILD_BYPRODUCTS ${LUAJIT_LIB}
+					PATCH_COMMAND sh -c "patch -p1 <${CMAKE_SOURCE_DIR}/cmake/modules/lua.patch"
+					UPDATE_COMMAND ""
+					INSTALL_COMMAND "")
 			else()
 				ExternalProject_Add(luajit
 					PREFIX "${PROJECT_BINARY_DIR}/luajit-prefix"
@@ -92,10 +104,10 @@ else()
 					INSTALL_COMMAND "")
 			endif()
 			install(FILES "${LUAJIT_LIB}" DESTINATION "${CMAKE_INSTALL_LIBDIR}/${LIBS_PACKAGE_NAME}"
-					COMPONENT "libs-deps")
+				COMPONENT "libs-deps")
 			install(DIRECTORY "${LUAJIT_INCLUDE}" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${LIBS_PACKAGE_NAME}"
-					COMPONENT "libs-deps"
-					FILES_MATCHING PATTERN "*.h")
+				COMPONENT "libs-deps"
+				FILES_MATCHING PATTERN "*.h")
 		else()
 			ExternalProject_Add(luajit
 				PREFIX "${PROJECT_BINARY_DIR}/luajit-prefix"

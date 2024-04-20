@@ -16,7 +16,7 @@
 # limitations under the License.
 #
 
-if(NOT WIN32)
+if(NOT WIN32 AND NOT EMSCRIPTEN)
 	include(ncurses)
 endif() # NOT WIN32
 
