@@ -24,12 +24,15 @@ limitations under the License.
 #include <libsinsp/filter.h>
 #include <libsinsp/filterchecks.h>
 
-#ifndef _WIN32
-#include <curses.h>
-#else
+#if defined(_WIN32)
 #include <conio.h>
 #define getch _getch
+#elif defined(EMSCRIPTEN)
+inline int getch() {return -1;}
+#else
+#include <curses.h>
 #endif
+
 #include <chisel/chisel_table.h>
 #include "cursescomponents.h"
 #include "cursestable.h"

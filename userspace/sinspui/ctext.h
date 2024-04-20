@@ -17,7 +17,7 @@ limitations under the License.
 
 */
 
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(EMSCRIPTEN)
 #include <fstream>
 #include <iostream>
 #include <string>

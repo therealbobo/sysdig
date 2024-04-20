@@ -45,13 +45,15 @@ limitations under the License.
 #include "utils/sinsp_opener.h"
 #include "utils/supported_fields.h"
 
-#ifdef _WIN32
+#if _WIN32
 #include "win32/getopt.h"
 #include <io.h>
 #else
 #include <unistd.h>
 #include <getopt.h>
+#ifndef NOCURSESUI
 #include <term.h>
+#endif
 #endif
 
 #include "cursescomponents.h"

@@ -1,0 +1,35 @@
+diff --git a/makefile b/makefile
+index 8160d4fb..efa062b5 100644
+--- a/makefile
++++ b/makefile
+@@ -53,15 +53,15 @@ LOCAL = $(TESTS) $(CWARNS) -g
+ 
+ 
+ # enable Linux goodies
+-MYCFLAGS= $(LOCAL) -std=c99 -DLUA_USE_LINUX -DLUA_COMPAT_5_2
+-MYLDFLAGS= $(LOCAL) -Wl,-E
+-MYLIBS= -ldl -lreadline
++MYCFLAGS= $(LOCAL) --target=wasm32-unknown-emscripten -DLUA_COMPAT_5_1
++MYLDFLAGS= $(LOCAL) -Wl,-E -sNODERAWFS
++#MYLIBS= -ldl -lreadline
+ 
+ 
+-CC= clang-3.8
++CC= emcc
+ CFLAGS= -Wall -O2 $(MYCFLAGS)
+-AR= ar rcu
+-RANLIB= ranlib
++AR= emar rcu
++RANLIB= emranlib
+ RM= rm -f
+ 
+ 
+@@ -71,7 +71,7 @@ RM= rm -f
+ 
+ LIBS = -lm
+ 
+-CORE_T=	liblua.a
++CORE_T=	libluajit.a
+ CORE_O=	lapi.o lcode.o lctype.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o \
+ 	lmem.o lobject.o lopcodes.o lparser.o lstate.o lstring.o ltable.o \
+ 	ltm.o lundump.o lvm.o lzio.o ltests.o

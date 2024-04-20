@@ -104,7 +104,8 @@ target_include_directories(
 		..
 	)
 
-if(NOT WIN32)
+if(EMSCRIPTEN)
+	add_definitions(-DNOCURSESUI)
 	include_directories(${PROJECT_BINARY_DIR}/driver/src)
 
 	target_link_libraries(sysdig
@@ -122,6 +123,26 @@ if(NOT WIN32)
 		"${CURSES_LIBRARIES}"
 		"${YAMLCPP_LIB}")
 
+	target_compile_options(sysdig PRIVATE "-sDISABLE_EXCEPTION_CATCHING=0")
+	target_link_options(sysdig PRIVATE "-sINVOKE_RUN=0")
+	target_link_options(sysdig PRIVATE "-sALLOW_MEMORY_GROWTH=1")
+	target_link_options(sysdig PRIVATE "-sDISABLE_EXCEPTION_CATCHING=0")
+	target_link_options(sysdig PRIVATE "-sMODULARIZE=1")
+	target_link_options(sysdig PRIVATE "-sFILESYSTEM=1")
+	target_link_options(sysdig PRIVATE "-sEXPORT_ES6=1")
+	target_link_options(sysdig PRIVATE "-sEXPORTED_RUNTIME_METHODS=['FS', 'callMain']")
+	target_link_options(sysdig PRIVATE "-sEXPORTED_FUNCTIONS=['_main','_htons','_ntohs']")
+
+	target_compile_options(csysdig PRIVATE "-sDISABLE_EXCEPTION_CATCHING=0")
+	target_link_options(csysdig PRIVATE "-sINVOKE_RUN=0")
+	target_link_options(csysdig PRIVATE "-sALLOW_MEMORY_GROWTH=1")
+	target_link_options(csysdig PRIVATE "-sDISABLE_EXCEPTION_CATCHING=0")
+	target_link_options(csysdig PRIVATE "-sMODULARIZE=1")
+	target_link_options(csysdig PRIVATE "-sFILESYSTEM=1")
+	target_link_options(csysdig PRIVATE "-sEXPORT_ES6=1")
+	target_link_options(csysdig PRIVATE "-sEXPORTED_RUNTIME_METHODS=['FS', 'callMain']")
+	target_link_options(csysdig PRIVATE "-sEXPORTED_FUNCTIONS=['_main','_htons','_ntohs']")
+
 	add_subdirectory(man)
 
 	install(TARGETS sysdig 
@@ -136,7 +157,7 @@ if(NOT WIN32)
 	file(COPY chisels
 		DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 
-else()
+elseif(WIN32)
 	add_definitions(-DNOCURSESUI)
 
 	target_link_libraries(sysdig
@@ -188,6 +209,38 @@ else()
 		#install(FILES "${LUAJIT_SRC}/lua51.dll"
 		#		DESTINATION programs
 		#		COMPONENT "${SYSDIG_COMPONENT_NAME}")
+
+else()
+	include_directories(${PROJECT_BINARY_DIR}/driver/src)
+
+	target_link_libraries(sysdig
+		sinsp
+		"${LUAJIT_LIB}"
+		"${YAMLCPP_LIB}")
+
+	if(USE_BUNDLED_NCURSES)
+		add_dependencies(csysdig ncurses)
+	endif()
+
+	target_link_libraries(csysdig
+		sinsp
+		"${LUAJIT_LIB}"
+		"${CURSES_LIBRARIES}"
+		"${YAMLCPP_LIB}")
+
+	add_subdirectory(man)
+
+	install(TARGETS sysdig
+		DESTINATION bin COMPONENT "${SYSDIG_COMPONENT_NAME}")
+
+	install(TARGETS csysdig
+		DESTINATION bin COMPONENT "${SYSDIG_COMPONENT_NAME}")
+
+	install(DIRECTORY chisels
+		DESTINATION share/sysdig COMPONENT "${SYSDIG_COMPONENT_NAME}")
+
+	file(COPY chisels
+		DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 
 endif()
 

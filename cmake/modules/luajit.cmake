@@ -35,13 +35,22 @@ elseif(NOT USE_BUNDLED_LUAJIT)
 		set(LUAJIT_INCLUDE ${LUA_INCLUDE_DIR})
 	endif()
 else()
-	set(LUAJIT_SRC "${PROJECT_BINARY_DIR}/luajit-prefix/src/luajit/src")
-	set(LUAJIT_INCLUDE "${LUAJIT_SRC}/")
 
-	if(NOT WIN32)
+	if(WIN32)
+		set(LUAJIT_SRC "${PROJECT_BINARY_DIR}/luajit-prefix/src/luajit/src")
+		set(LUAJIT_INCLUDE "${LUAJIT_SRC}/")
+		set(LUAJIT_LIB "${LUAJIT_SRC}/lua51.lib")
+	elseif(EMSCRIPTEN)
+		set(LUAJIT_SRC "${PROJECT_BINARY_DIR}/luajit-prefix/src/luajit/")
+		set(LUAJIT_INCLUDE "${LUAJIT_SRC}/")
 		set(LUAJIT_LIB "${LUAJIT_SRC}/libluajit.a")
 	else()
-		set(LUAJIT_LIB "${LUAJIT_SRC}/lua51.lib")
+		set(LUAJIT_SRC "${PROJECT_BINARY_DIR}/luajit-prefix/src/luajit/src")
+		set(LUAJIT_INCLUDE "${LUAJIT_SRC}/")
+		set(LUAJIT_LIB "${LUAJIT_SRC}/libluajit.a")
+	endif()
+
+	if(EMSCRIPTEN)
 	endif()
 
 	if(NOT TARGET luajit)
@@ -83,7 +92,7 @@ else()
 				ExternalProject_Add(luajit
 					PREFIX "${PROJECT_BINARY_DIR}/luajit-prefix"
 					GIT_REPOSITORY "https://github.com/lua/lua"
-					GIT_TAG "v5.4.6"
+					GIT_TAG "v5.3.4"
 					CONFIGURE_COMMAND ""
 					BUILD_COMMAND emmake make CC=emcc
 					BUILD_IN_SOURCE 1
