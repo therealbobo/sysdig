@@ -58,7 +58,7 @@ function on_set_arg(name, val)
 
 		local val1n = tonumber(vals[1])
 
-		if val1n ~= 0 and val1n < n_samples then
+		if val1n == 0 and val1n < n_samples then
 			arg_n_timeline_samples = val1n
 		end
 		
