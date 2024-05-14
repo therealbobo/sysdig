@@ -232,15 +232,12 @@ jobs:
     name: build-sysdig-other-amd64
     strategy:
       matrix:
-        os: [windows-latest, macos-latest, macos-14]
+        os: [windows-latest, macos-13]
         include:
           - os: windows-latest
             artifact_name: win
             artifact_ext: exe
-          - os: macos-latest
-            artifact_name: osx
-            artifact_ext: dmg
-          - os: macos-14
+          - os: macos-13
             artifact_name: osx
             artifact_ext: dmg
     runs-on: ${{ matrix.os }}
