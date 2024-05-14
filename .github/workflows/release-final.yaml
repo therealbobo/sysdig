@@ -60,7 +60,7 @@ jobs:
       REPOSITORY_DIR: rpm_repo
       PACKAGES_DIR: packages
       S3_BUCKET: download.draios.com
-      RELEASE: ${{ github.event.release.name }}
+      RELEASE: ${{ (github.event_name == 'workflow_dispatch') && (github.event.inputs.version != '') && github.event.inputs.version || github.event.release.name }}
       KEY_ID: EC51E8C4
 
     # These permissions are needed to interact with GitHub's OIDC Token endpoint.
@@ -134,7 +134,7 @@ jobs:
       REPOSITORY_NAME: stable
       REPOSITORY_DIR: deb_repo
       PACKAGES_DIR: packages
-      RELEASE: ${{ github.event.release.name }}
+      RELEASE: ${{ (github.event_name == 'workflow_dispatch') && (github.event.inputs.version != '') && github.event.inputs.version || github.event.release.name }}
       S3_BUCKET: download.draios.com
       KEY_ID: EC51E8C4
     
@@ -200,7 +200,7 @@ jobs:
       REPOSITORY_NAME: stable
       REPOSITORY_DIR: tgz_repo
       PACKAGES_DIR: packages
-      RELEASE: ${{ github.event.release.name }}
+      RELEASE: ${{ (github.event_name == 'workflow_dispatch') && (github.event.inputs.version != '') && github.event.inputs.version || github.event.release.name }}
       S3_BUCKET: download.draios.com
 
     # These permissions are needed to interact with GitHub's OIDC Token endpoint.
