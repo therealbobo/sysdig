@@ -119,12 +119,12 @@ jobs:
     name: build-release-others-amd64
     strategy:
       matrix:
-        os: [windows-latest, macos-latest]
+        os: [windows-latest, macos-13]
         include:
           - os: windows-latest
             artifact_name: win
             artifact_ext: exe
-          - os: macos-latest
+          - os: macos-13
             artifact_name: osx
             artifact_ext: dmg
     env:
