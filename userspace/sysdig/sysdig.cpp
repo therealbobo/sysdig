@@ -290,6 +290,7 @@ static void usage()
 " -M <num_seconds>   Stop collecting after <num_seconds> reached.\n"
 " -n <num>, --numevents=<num>\n"
 "                    Stop capturing after <num> events\n"
+" --no-color         Avoid using colors on terminal output.\n"
 " --page-faults      Capture user/kernel major/minor page faults\n"
 " --plugin-config-file\n"
 "                    Load the plugin configuration from a Falco-compatible yaml file.\n"
@@ -1037,6 +1038,7 @@ sysdig_init_res sysdig_init(int argc, char **argv)
 	sinsp_opener opener;
 	std::unique_ptr<filter_check_list> filter_list;
 	std::shared_ptr<sinsp_filter_factory> filter_factory;
+	bool no_color_flag = false;
 
 	// These variables are for the cycle_writer engine
 	int duration_seconds = 0;
@@ -1110,21 +1112,9 @@ sysdig_init_res sysdig_init(int argc, char **argv)
 		{"print-hex", no_argument, 0, 'x'},
 		{"print-hex-ascii", no_argument, 0, 'X'},
 		{"compress", no_argument, 0, 'z' },
+		{"no-color", no_argument, 0, 0 },
 		{0, 0, 0, 0}
 	};
-
-#ifndef _WIN32
-	if (isatty(fileno(stdout)))
-	{
-		output_format = R"(*%evt.num %evt.outputtime %evt.cpu \e[01;32m%proc.name\e[00m (\e[01;36m%proc.pid\e[00m.%thread.tid) %evt.dir \e[01;34m%evt.type\e[00m %evt.info)";
-		output_format_plugin = R"(*%evt.num %evt.datetime.s [\e[01;32m%evt.pluginname\e[00m] %evt.plugininfo)";
-	}
-	else
-#endif
-	{
-		output_format = "*%evt.num %evt.outputtime %evt.cpu %proc.name (%thread.tid) %evt.dir %evt.type %evt.info";
-		output_format_plugin = "*%evt.num %evt.datetime.s [%evt.pluginname] %evt.plugininfo";
-	}
 
 	try
 	{
@@ -1640,6 +1630,11 @@ sysdig_init_res sysdig_init(int argc, char **argv)
 						plugins.print_plugin_info(inspector.get(), filter_list.get(), name);
 						return sysdig_init_res(EXIT_SUCCESS);
 					}
+
+					else if (optname == "no-color")
+					{
+						no_color_flag = true;
+					}
 				}
 				break;
 			// getopt_long : '?' for an ambiguous match or an extraneous parameter
@@ -1650,6 +1645,21 @@ sysdig_init_res sysdig_init(int argc, char **argv)
 				break;
 			}
 		}
+
+#ifndef _WIN32
+	char* no_color = getenv("NO_COLOR");
+	if (isatty(fileno(stdout)) &&
+		(no_color != nullptr && strcmp(no_color, "1") != 0) && !no_color_flag)
+	{
+		output_format = R"(*%evt.num %evt.outputtime %evt.cpu \e[01;32m%proc.name\e[00m (\e[01;36m%proc.pid\e[00m.%thread.tid) %evt.dir \e[01;34m%evt.type\e[00m %evt.info)";
+		output_format_plugin = R"(*%evt.num %evt.datetime.s [\e[01;32m%evt.pluginname\e[00m] %evt.plugininfo)";
+	}
+	else
+#endif
+	{
+		output_format = "*%evt.num %evt.outputtime %evt.cpu %proc.name (%thread.tid) %evt.dir %evt.type %evt.info";
+		output_format_plugin = "*%evt.num %evt.datetime.s [%evt.pluginname] %evt.plugininfo";
+	}
 
 		// given the CLI options, we finish loading and initializing plugins.
 		// if no plugin has been specified as input with -I, we try to
