@@ -337,7 +337,7 @@ private:
 	inline void add_fields_min(ppm_param_type type, chisel_table_field* dst, chisel_table_field* src);
 	inline void add_fields(uint32_t dst_id, chisel_table_field* src, uint32_t aggr);
 	void process_proctable(sinsp_evt* evt, uint64_t last_evt_ts = 0);
-	inline uint32_t get_field_len(uint32_t id) const;
+	inline uint32_t get_field_len(uint32_t id, uint32_t extracted_len = 0) const;
 	inline uint8_t* get_default_val(filtercheck_field_info* fld);
 	void create_sample();
 	void switch_buffers();
