@@ -495,7 +495,7 @@ void chisel_table::process_event(sinsp_evt* evt)
 			pfld->m_val = m_premerge_extractors[j]->m_check->m_extracted_values[0].ptr;
 			// Compute len
 			// NOTE: this internally uses m_fld_pointers thus the m_val must be already set, as above.
-			pfld->m_len = get_field_len(j);
+			pfld->m_len = get_field_len(j, m_premerge_extractors[j]->m_check->m_extracted_values[0].len);
 			// Finally, create the buffer copy and store it to val.
 			pfld->m_val = m_buffer->copy(m_premerge_extractors[j]->m_check->m_extracted_values[0].ptr, pfld->m_len);
 			pfld->m_cnt = 1;
@@ -1423,7 +1423,7 @@ void chisel_table::add_fields(uint32_t dst_id, chisel_table_field* src, uint32_t
 	}
 }
 
-uint32_t chisel_table::get_field_len(uint32_t id) const
+uint32_t chisel_table::get_field_len(uint32_t id, uint32_t extracted_len) const
 {
 	ppm_param_type type;
 	chisel_table_field *fld;
@@ -1477,7 +1477,9 @@ uint32_t chisel_table::get_field_len(uint32_t id) const
 		return sizeof(ipv6addr);
 	case PT_IPADDR:
 	case PT_IPNET:
-		if(fld->m_len == sizeof(struct in_addr))
+		if(extracted_len == 0)
+			extracted_len = fld->m_len;
+		if(extracted_len == sizeof(struct in_addr))
 		{
 			return 4;
 		}
