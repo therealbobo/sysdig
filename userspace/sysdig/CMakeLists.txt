@@ -153,11 +153,6 @@ else()
 
 	target_link_libraries(csysdig odbc32.lib odbccp32.lib Netapi32.lib Iphlpapi.lib)
 
-	#add_custom_command(TARGET sysdig POST_BUILD
-	#	COMMAND "${CMAKE_COMMAND}" -E copy_if_different
-	#		"${LUAJIT_SRC}/lua51.dll"
-	#		"${PROJECT_BINARY_DIR}/$(Configuration)/lua51.dll")
-
 	add_custom_command(TARGET sysdig POST_BUILD
 		COMMAND "${CMAKE_COMMAND}" -E copy_directory
 			"${PROJECT_SOURCE_DIR}/userspace/sysdig/chisels"
@@ -184,10 +179,6 @@ else()
 	install(DIRECTORY chisels
 			DESTINATION programs
 			COMPONENT "${SYSDIG_COMPONENT_NAME}")
-
-		#install(FILES "${LUAJIT_SRC}/lua51.dll"
-		#		DESTINATION programs
-		#		COMPONENT "${SYSDIG_COMPONENT_NAME}")
 
 endif()
 
