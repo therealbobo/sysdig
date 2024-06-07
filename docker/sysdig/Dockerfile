@@ -1,8 +1,8 @@
-FROM registry.access.redhat.com/ubi8/ubi
+FROM registry.access.redhat.com/ubi9/ubi
 
 LABEL usage="docker run --rm -i -t --privileged --net=host -v /var/run/docker.sock:/host/var/run/docker.sock -v /dev:/host/dev -v /proc:/host/proc:ro -v /boot:/host/boot:ro -v /src:/src -v /lib/modules:/host/lib/modules:ro -v /usr:/host/usr:ro -v /etc:/host/etc:ro --name NAME IMAGE"
 
-ARG BUILD_VERSION=0.1.1dev
+ARG BUILD_VERSION=0.38.0-rc1
 ENV BUILD_VERSION=${BUILD_VERSION}
 
 ENV HOST_ROOT /host
@@ -23,17 +23,15 @@ RUN mkdir -p /tmp/dkms \
     && make tarball \
     && make install \
     && cd /tmp \
-    && rm -fr /tmp/dkms
+    && rm -fr /tmp/dkms \
+	&& curl -LO https://github.com/draios/sysdig/releases/download/${BUILD_VERSION}/sysdig-${BUILD_VERSION}-x86_64.rpm \
+	&& rpm --nodeps --force -i sysdig-${BUILD_VERSION}-$(uname -m).rpm && rm sysdig-*.rpm
 
-COPY ./sysdig-${BUILD_VERSION}-*.rpm /
-
-RUN rpm --nodeps --force -i /sysdig-${BUILD_VERSION}-$(uname -p).rpm && rm /sysdig-*.rpm
-
-COPY docker/sysdig/docker-entrypoint.sh /
+COPY ./docker-entrypoint.sh /
 
 RUN rm -df /lib/modules \
 	&& ln -s $HOST_ROOT/lib/modules /lib/modules
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
-CMD ["bash"]
+CMD ["/usr/bin/sysdig"]
