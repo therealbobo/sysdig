@@ -1055,6 +1055,7 @@ sysdig_init_res sysdig_init(int argc, char **argv)
 	std::unique_ptr<filter_check_list> filter_list;
 	std::shared_ptr<sinsp_filter_factory> filter_factory;
 	color_term_out color_flag = COLOR;
+	bool user_defined_format = false;
 
 	// These variables are for the cycle_writer engine
 	int duration_seconds = 0;
@@ -1427,6 +1428,7 @@ sysdig_init_res sysdig_init(int argc, char **argv)
 					output_format = optarg;
 					output_format_plugin = optarg;
 				}
+				user_defined_format = true;
 
 				break;
 			case 'q':
@@ -1679,18 +1681,21 @@ sysdig_init_res sysdig_init(int argc, char **argv)
 			}
 		}
 
-	char* no_color_env = getenv("NO_COLOR");
-        if ((color_flag == FORCE_COLOR) ||
-            (stdout_supports_color() && (no_color_env != nullptr && no_color_env[0] != '\0') && color_flag == COLOR))
-	{
-		output_format = R"(*%evt.num %evt.outputtime %evt.cpu \e[01;32m%proc.name\e[00m (\e[01;36m%proc.pid\e[00m.%thread.tid) %evt.dir \e[01;34m%evt.type\e[00m %evt.info)";
-		output_format_plugin = R"(*%evt.num %evt.datetime.s [\e[01;32m%evt.pluginname\e[00m] %evt.plugininfo)";
-	}
-	else
-	{
-		output_format = "*%evt.num %evt.outputtime %evt.cpu %proc.name (%thread.tid) %evt.dir %evt.type %evt.info";
-		output_format_plugin = "*%evt.num %evt.datetime.s [%evt.pluginname] %evt.plugininfo";
-	}
+		if(!user_defined_format)
+		{
+			char* no_color_env = getenv("NO_COLOR");
+			if ((color_flag == FORCE_COLOR) ||
+				(stdout_supports_color() && no_color_env == nullptr && color_flag == COLOR))
+			{
+				output_format = R"(*%evt.num %evt.outputtime %evt.cpu \e[01;32m%proc.name\e[00m (\e[01;36m%proc.pid\e[00m.%thread.tid) %evt.dir \e[01;34m%evt.type\e[00m %evt.info)";
+				output_format_plugin = R"(*%evt.num %evt.datetime.s [\e[01;32m%evt.pluginname\e[00m] %evt.plugininfo)";
+			}
+			else
+			{
+				output_format = "*%evt.num %evt.outputtime %evt.cpu %proc.name (%thread.tid) %evt.dir %evt.type %evt.info";
+				output_format_plugin = "*%evt.num %evt.datetime.s [%evt.pluginname] %evt.plugininfo";
+			}
+		}
 
 		// given the CLI options, we finish loading and initializing plugins.
 		// if no plugin has been specified as input with -I, we try to
