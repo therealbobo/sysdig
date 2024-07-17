@@ -1913,8 +1913,7 @@ sysdig_init_res sysdig_init(int argc, char **argv)
 			{
 				try
 				{
-					sinsp_filter_compiler compiler(filter_factory, filter);
-					inspector->set_filter(compiler.compile());
+					inspector->set_filter(filter);
 				}
 				catch (sinsp_exception& e)
 				{
