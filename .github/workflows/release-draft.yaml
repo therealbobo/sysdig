@@ -38,6 +38,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       BUILD_VERSION: ${{ github.ref_name }}
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
     container:
       image: ghcr.io/draios/sysdig-builder:dev
     steps:
@@ -71,6 +72,7 @@ jobs:
     env:
       REGISTRY: ghcr.io
       BUILD_VERSION: ${{ github.ref_name }}
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
     steps:
       - name: Checkout Sysdig
         uses: actions/checkout@v3
