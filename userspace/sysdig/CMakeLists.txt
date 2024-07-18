@@ -87,7 +87,6 @@ endif()
 target_include_directories(
 	sysdig
 	PUBLIC
-		"${YAMLCPP_INCLUDE_DIR}"
 		"${NJSON_INCLUDE_DIR}"
 		"${LUAJIT_INCLUDE}"
 		../chisel
@@ -97,7 +96,6 @@ target_include_directories(
 target_include_directories(
 	csysdig
 	PUBLIC
-		"${YAMLCPP_INCLUDE_DIR}"
 		"${NJSON_INCLUDE_DIR}"
 		"${LUAJIT_INCLUDE}"
 		../chisel
@@ -110,7 +108,7 @@ if(NOT WIN32)
 	target_link_libraries(sysdig
 		sinsp
 		"${LUAJIT_LIB}"
-		"${YAMLCPP_LIB}")
+		yaml-cpp)
 
 	if(USE_BUNDLED_NCURSES)
 		add_dependencies(csysdig ncurses)
@@ -120,7 +118,7 @@ if(NOT WIN32)
 		sinsp
 		"${LUAJIT_LIB}"
 		"${CURSES_LIBRARIES}"
-		"${YAMLCPP_LIB}")
+		yaml-cpp)
 
 	add_subdirectory(man)
 
@@ -142,12 +140,12 @@ else()
 	target_link_libraries(sysdig
 		sinsp
 		"${LUAJIT_LIB}"
-		"${YAMLCPP_LIB}")
+		yaml-cpp)
 
 	target_link_libraries(csysdig
 		sinsp
 		"${LUAJIT_LIB}"
-		"${YAMLCPP_LIB}")
+		yaml-cpp)
 
 	target_link_libraries(sysdig odbc32.lib odbccp32.lib Netapi32.lib Iphlpapi.lib)
 
