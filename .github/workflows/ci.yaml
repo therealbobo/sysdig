@@ -116,6 +116,8 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ${{ needs.builder.outputs.builder_image }}
+    env:
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
     steps:
       - name: Checkout Sysdig
         uses: actions/checkout@v3
@@ -163,6 +165,7 @@ jobs:
       SKEL_BUILDER_IMAGE_BASE: ghcr.io/draios/sysdig-skel-builder-pr
       BUILDER_DEV: ghcr.io/draios/sysdig-builder:dev
       SKEL_BUILDER_DEV: ghcr.io/draios/sysdig-skel-builder:dev
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Sysdig
