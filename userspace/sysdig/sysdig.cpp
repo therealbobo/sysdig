@@ -1913,7 +1913,9 @@ sysdig_init_res sysdig_init(int argc, char **argv)
 			{
 				try
 				{
-					inspector->set_filter(filter);
+					sinsp_filter_compiler compiler(filter_factory, filter);
+					std::unique_ptr<sinsp_filter> s = compiler.compile();
+					inspector->set_filter(std::move(s), filter);
 				}
 				catch (sinsp_exception& e)
 				{
