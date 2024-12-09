@@ -26,12 +26,11 @@ RUN yum -y install centos-release-scl; \
     yum -y install devtoolset-9-gcc devtoolset-9-gcc-c++ git wget make m4 rpm-build clang perl-IPC-Cmd ; \
 	source scl_source enable devtoolset-9
 
-# With some previous cmake versions it fails when downloading `zlib` with curl in the libs building phase
-RUN curl -L -o /tmp/cmake.tar.gz https://github.com/Kitware/CMake/releases/download/v3.22.5/cmake-3.22.5-linux-$(uname -m).tar.gz; \
+RUN curl -L -o /tmp/cmake.tar.gz https://github.com/Kitware/CMake/releases/download/v3.27.6/cmake-3.27.6-linux-$(uname -m).tar.gz; \
     gzip -d /tmp/cmake.tar.gz; \
     tar -xpf /tmp/cmake.tar --directory=/tmp; \
-    cp -R /tmp/cmake-3.22.5-linux-$(uname -m)/* /usr; \
-    rm -rf /tmp/cmake-3.22.5-linux-$(uname -m)/
+    cp -R /tmp/cmake-3.27.6-linux-$(uname -m)/* /usr; \
+    rm -rf /tmp/cmake-3.27.6-linux-$(uname -m)/
 
 # DTS
 ENV BASH_ENV=/usr/bin/scl_enable \
