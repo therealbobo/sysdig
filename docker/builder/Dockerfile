@@ -22,7 +22,13 @@ COPY ./root /
 WORKDIR /
 
 # build toolchain
-RUN yum -y install centos-release-scl; \
+RUN sed -i 's/mirror.centos.org/vault.centos.org/g' /etc/yum.repos.d/*.repo && \
+	sed -i 's/^#.*baseurl=http/baseurl=https/g' /etc/yum.repos.d/*.repo && \
+    sed -i 's/^mirrorlist=http/#mirrorlist=https/g' /etc/yum.repos.d/*.repo && \
+	yum -y install centos-release-scl; \
+	sed -i 's/mirror.centos.org/vault.centos.org/g' /etc/yum.repos.d/*.repo && \
+	sed -i 's/^#.*baseurl=http/baseurl=https/g' /etc/yum.repos.d/*.repo && \
+    sed -i 's/^mirrorlist=http/#mirrorlist=https/g' /etc/yum.repos.d/*.repo && \
     yum -y install devtoolset-9-gcc devtoolset-9-gcc-c++ git wget make m4 rpm-build clang perl-IPC-Cmd ; \
 	source scl_source enable devtoolset-9
 
