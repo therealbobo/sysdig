@@ -1,7 +1,4 @@
-FROM centos:7
-
-LABEL name="sysdig/sysdig-builder"
-LABEL usage="docker run -v $PWD/..:/source -v $PWD/build:/build sysdig/sysdig-builder cmake"
+FROM ubuntu:22.04
 
 ARG BUILD_TYPE=release
 ARG BUILD_DRIVER=OFF
@@ -17,31 +14,52 @@ ENV BUILD_VERSION=${BUILD_VERSION}
 ENV BUILD_WARNINGS_AS_ERRORS=${BUILD_WARNINGS_AS_ERRORS}
 ENV MAKE_JOBS=${MAKE_JOBS}
 
-COPY ./root /
+ARG ZIG_VERSION=0.14.0-dev.2643+fb43e91b2
+
+COPY ./zig-cc  /usr/bin/
+COPY ./zig-c++ /usr/bin/
 
 WORKDIR /
 
-# build toolchain
-RUN sed -i 's/mirror.centos.org/vault.centos.org/g' /etc/yum.repos.d/*.repo && \
-	sed -i 's/^#.*baseurl=http/baseurl=https/g' /etc/yum.repos.d/*.repo && \
-    sed -i 's/^mirrorlist=http/#mirrorlist=https/g' /etc/yum.repos.d/*.repo && \
-	yum -y install centos-release-scl; \
-	sed -i 's/mirror.centos.org/vault.centos.org/g' /etc/yum.repos.d/*.repo && \
-	sed -i 's/^#.*baseurl=http/baseurl=https/g' /etc/yum.repos.d/*.repo && \
-    sed -i 's/^mirrorlist=http/#mirrorlist=https/g' /etc/yum.repos.d/*.repo && \
-    yum -y install devtoolset-9-gcc devtoolset-9-gcc-c++ git wget make m4 rpm-build clang perl-IPC-Cmd ; \
-	source scl_source enable devtoolset-9
-
-RUN curl -L -o /tmp/cmake.tar.gz https://github.com/Kitware/CMake/releases/download/v3.27.6/cmake-3.27.6-linux-$(uname -m).tar.gz; \
-    gzip -d /tmp/cmake.tar.gz; \
-    tar -xpf /tmp/cmake.tar --directory=/tmp; \
-    cp -R /tmp/cmake-3.27.6-linux-$(uname -m)/* /usr; \
-    rm -rf /tmp/cmake-3.27.6-linux-$(uname -m)/
-
-# DTS
-ENV BASH_ENV=/usr/bin/scl_enable \
-    ENV=/usr/bin/scl_enable \
-    PROMPT_COMMAND=". /usr/bin/scl_enable"
-
-ENTRYPOINT ["build"]
-CMD ["usage"]
+RUN apt update && \
+    apt install -y --no-install-recommends \
+        autoconf \
+        automake \
+        build-essential \
+        ca-certificates \
+        clang \
+        cmake \
+        curl \
+        git \
+        libc-ares-dev \
+        libcurl4-openssl-dev \
+        libelf-dev \
+        libgrpc++-dev \
+        libgtest-dev \
+        libjq-dev \
+        libjsoncpp-dev \
+        libprotobuf-dev \
+        libssl-dev \
+        libtbb-dev \
+        libtool \
+        llvm \
+        ninja-build \
+        pkg-config \
+        protobuf-compiler-grpc \
+        wget \
+        xz-utils && \
+    git clone https://github.com/libbpf/bpftool.git --branch v7.3.0 --single-branch && \
+    cd bpftool && \
+    git submodule update --init && \
+    cd src && \
+    make install && \
+    cd ../.. && \
+    rm -fr bpftool && \
+    curl -LO https://ziglang.org/builds/zig-linux-$(uname -m)-${ZIG_VERSION}.tar.xz && \
+    tar -xaf zig-linux-$(uname -m)-${ZIG_VERSION}.tar.xz && \
+    rm -v zig-linux-$(uname -m)-${ZIG_VERSION}.tar.xz && \
+    cd zig-linux-$(uname -m)-${ZIG_VERSION} &&  \
+    cp -v zig /usr/bin && \
+    find lib -exec cp --parents {} /usr/ \; && \
+    cd .. && \
+    rm -fr zig*
