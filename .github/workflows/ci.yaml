@@ -15,7 +15,12 @@ jobs:
       SKEL_BUILDER_IMAGE_BASE: ghcr.io/draios/sysdig-skel-builder-pr
       BUILDER_DEV: ghcr.io/draios/sysdig-builder:dev
       SKEL_BUILDER_DEV: ghcr.io/draios/sysdig-skel-builder:dev
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04${{ matrix.platform == 'arm64' && '-arm64' || '' }}
+    strategy:
+      matrix:
+        platform:
+          - amd64
+          - arm64
     steps:
       - name: Checkout Sysdig
         uses: actions/checkout@v4
@@ -28,12 +33,6 @@ jobs:
         with:
           files: |
             docker/builder/**
-
-      - name: Set up QEMU
-        if: steps.builder-files.outputs.any_changed == 'true'
-        uses: docker/setup-qemu-action@v3
-        with:
-          platforms: 'amd64,arm64'
 
       - name: Set up Docker Buildx
         if: steps.builder-files.outputs.any_changed == 'true'
@@ -59,7 +58,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: docker/builder
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/${{ matrix.platform }}
           tags: ${{ steps.get-new-builder.outputs.builder_image }}
           push: true
     outputs:
@@ -67,19 +66,16 @@ jobs:
 
   build-sysdig-linux:
     needs: [builder]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04${{ matrix.platform == 'arm64' && '-arm64' || '' }}
     container:
       image: ${{ needs.builder.outputs.builder_image }}
     strategy:
       matrix:
         platform:
-          - linux/amd64
-          - linux/arm64
+          - amd64
+          - arm64
 
     steps:
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
       - name: Checkout Sysdig
         uses: actions/checkout@v4
         with:
