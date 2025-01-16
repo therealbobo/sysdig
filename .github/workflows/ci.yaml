@@ -133,7 +133,7 @@ jobs:
           cmake -Wno-dev -S . -B build
           cmake --build build --target package --config Release
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: sysdig-dev-${{ matrix.artifact_name }}-x86_64.${{ matrix.artifact_ext }}
           path: |
@@ -157,7 +157,7 @@ jobs:
           cmake -Wno-dev -S . -B build
           cmake --build build --target package --config Release
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: sysdig-dev-${{ matrix.artifact_name }}-arm64.${{ matrix.artifact_ext }}
           path: |
