@@ -6,7 +6,7 @@ DRY_RUN="${DRY_RUN:-false}"
 TMPDIR="$(mktemp -d)"
 ARCH="$1"
 LIST_URL="https://falcosecurity.github.io/kernel-crawler/${ARCH}/list.json"
-EXCLUDE_LIST=(.ArchLinux .Fedora .PhotonOS .Flatcar .OpenSUSE .RockyLinux .Oracle6 .Oracle7 .Oracle8)
+EXCLUDE_LIST=(.arch .fedora .photon .flatcar .opensuse .rocky .ol)
 EXCLUDE_STRING=$(echo ${EXCLUDE_LIST[@]} | tr ' ' ',')
 
 function pretty_echo() {
